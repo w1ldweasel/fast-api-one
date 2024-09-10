@@ -1,37 +1,24 @@
 pipeline {
     agent any
-
-    environment {
-        SONARQUBE_ENV = 'sonarqube' // Match SonarQube server name in Jenkins configuration
-    }
-
     stages {
-        stage('Clone repository') {
+        stage('Build') {
             steps {
-                git credentialsId: 'github-credentials-id', url: 'https://github.com/yourusername/yourrepo.git'
+                echo 'Building...'
+                // Add your build commands here
             }
         }
-
-        stage('SonarQube Scan') {
+        stage('Test') {
             steps {
-                withSonarQubeEnv(SONARQUBE_ENV) {
-                    sh '''
-                    sonar-scanner \
-                    -Dsonar.projectKey=your_project_key \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://sonarqube:9000 \
-                    -Dsonar.login=$SONARQUBE_AUTH_TOKEN
-                    '''
-                }
+                echo 'Testing...'
+                // Add your test commands here
             }
         }
-
-        stage('Quality Gate') {
+        stage('Deploy') {
             steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    waitForQualityGate abortPipeline: true
-                }
+                echo 'Deploying...'
+                // Add your deploy commands here
             }
         }
     }
 }
+
