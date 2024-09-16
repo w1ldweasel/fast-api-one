@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/w1ldweasel/fast-api-one.git'
+                git branch: 'main', 'https://github.com/w1ldweasel/fast-api-one.git'
             }
         }
         stage('Build') {
