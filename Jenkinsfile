@@ -1,24 +1,35 @@
 pipeline {
     agent any
+    tools {
+        maven 'Maven' // Ensure Maven is installed in Jenkins
+    }
     stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/your-repo.git'
+            }
+        }
         stage('Build') {
             steps {
-                echo 'Building...'
-                // Add your build commands here
+                sh 'mvn clean package'
             }
         }
-        stage('Test') {
+        stage('SonarQube Analysis') {
+            environment {
+                scannerHome = tool 'SonarQube Scanner'
+            }
             steps {
-                echo 'Testing...'
-                // Add your test commands here
+                withSonarQubeEnv('SonarQube') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
             }
         }
-        stage('Deploy') {
+        stage('Quality Gate') {
             steps {
-                echo 'Deploying...'
-                // Add your deploy commands here
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
     }
 }
-
