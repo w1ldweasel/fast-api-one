@@ -1,34 +1,21 @@
 pipeline {
     agent any
-    tools {
-        maven 'Maven' // Ensure Maven is installed in Jenkins
-    }
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/w1ldweasel/fast-api-one.git'
             }
         }
-        stage('Build') {
+        stage('Install Dependencies') {
             steps {
-                sh 'mvn clean package'
+                // Install dependencies from requirements.txt
+                sh 'pip install -r requirements.txt'
             }
         }
-        stage('SonarQube Analysis') {
-            environment {
-                scannerHome = tool 'SonarQube Scanner'
-            }
+        stage('Run Tests') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh "${scannerHome}/bin/sonar-scanner"
-                }
-            }
-        }
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    waitForQualityGate abortPipeline: true
-                }
+                // Run tests using pytest
+                sh 'pytest'
             }
         }
     }
