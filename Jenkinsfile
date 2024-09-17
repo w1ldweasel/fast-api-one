@@ -1,13 +1,13 @@
 pipeline {
     agent any
     environment {
-        SONARQUBE_URL = 'sonarqube'  // Use http://localhost:9000/ or in this case the container name if on same Docker bridge network
+        SONARQUBE_URL = 'http://sonarqube:9000'
         GITHUB_REPO_URL = 'https://github.com/w1ldweasel/fast-api-one.git'
-        SONAR_PROJECT_KEY = 'fast-api-one' //project-key
+        SONAR_PROJECT_KEY = 'fast-api-one'
         SONAR_LOGIN_TOKEN = credentials('jenkin-sonar')  // Stored in Jenkins
-        GIT_CREDENTIALS_ID = 'PAT'  // GitHub PAT 
-        
-   stages {
+        GIT_CREDENTIALS_ID = 'PAT'  // GitHub PAT or SSH key in Jenkins
+    }
+    stages {
         stage('Checkout Code') {
             steps {
                 checkout([$class: 'GitSCM',
@@ -34,3 +34,6 @@ pipeline {
         }
     }
 }
+
+        
+
