@@ -1,22 +1,36 @@
 pipeline {
     agent any
+    environment {
+        SONARQUBE_URL = 'sonarqube'  // Use http://localhost:9000/ or in this case the container name if on same Docker bridge network
+        GITHUB_REPO_URL = 'https://github.com/w1ldweasel/fast-api-one.git'
+        SONAR_PROJECT_KEY = 'fast-api-one' //project-key
+        SONAR_LOGIN_TOKEN = credentials('jenkin-sonar')  // Stored in Jenkins
+        GIT_CREDENTIALS_ID = 'PAT'  // GitHub PAT 
+    }
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/w1ldweasel/fast-api-one.git'
+                checkout([$class: 'GitSCM',
+                    branches: [[name: 'main']],
+                    userRemoteConfigs: [[
+                        url: GITHUB_REPO_URL,
+                        credentialsId: GIT_CREDENTIALS_ID
+                    ]]
+                ])
             }
         }
-        stage('Install Dependencies') {
+        stage('SonarQube Analysis') {
             steps {
-                // Install dependencies from requirements.txt
-                sh 'pip install -r requirements.txt'
-            }
-        }
-        stage('Run Tests') {
-            steps {
-                // Run tests using pytest
-                sh 'pytest'
+                sh """
+                sonar-scanner \
+                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=${SONARQUBE_URL} \
+                    -Dsonar.login=${SONAR_LOGIN_TOKEN}
+                """
             }
         }
     }
 }
+
+
