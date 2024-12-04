@@ -2,6 +2,9 @@
 #from pydantic import BaseModel replace pydantic with sqlmodel, that inherits from BaseModel
 from sqlmodel import SQLModel, Field, Relationship
 
+# SQLModel inherits from pydantic BaseModel
+# Pass table=True when creating the class to map this to to a DB table
+
 class TripInput(SQLModel):
     start: int
     end: int
